@@ -21,16 +21,16 @@ public class RatingService {
   }
 
   @Transactional
-  public RatingResponse createOrUpdate(CreateOrUpdateRatingRequest request) {
+  public RatingResponse createOrUpdate(CreateOrUpdateRatingRequest request, String userId) {
     var rating =
         ratingRepository
-            .findByAlbumIdAndUserId(request.albumId(), request.userId())
+            .findByAlbumIdAndUserId(request.albumId(), userId)
             .map(
                 existingRating -> {
                   existingRating.updateRating(request.rating());
                   return existingRating;
                 })
-            .orElseGet(() -> new Rating(request.albumId(), request.userId(), request.rating()));
+            .orElseGet(() -> new Rating(request.albumId(), userId, request.rating()));
 
     var savedRating = ratingRepository.save(rating);
     albumRatedPublisher.publish(savedRating);

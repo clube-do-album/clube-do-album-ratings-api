@@ -92,9 +92,14 @@ Body:
 ```json
 {
   "albumId": "uuid-do-album",
-  "userId": "uuid-do-usuario",
   "rating": 4.5
 }
+```
+
+O usuario da avaliacao vem do header interno enviado pelo Gateway:
+
+```http
+X-User-Id: uuid-do-usuario
 ```
 
 ```http
@@ -104,6 +109,8 @@ GET /ratings/albums/{albumId}
 ```http
 GET /ratings/users/{userId}
 ```
+
+Essa rota tambem exige `X-User-Id` e so permite consultar o proprio usuario autenticado.
 
 ## Mensageria
 
@@ -149,7 +156,8 @@ Crie ou atualize uma avaliacao:
 ```bash
 curl -X POST "http://localhost:8082/ratings" \
   -H "Content-Type: application/json" \
-  -d '{"albumId":"album-1","userId":"user-1","rating":4.5}'
+  -H "X-User-Id: user-1" \
+  -d '{"albumId":"album-1","rating":4.5}'
 ```
 
 Liste por album:
@@ -163,6 +171,8 @@ Liste por usuario:
 ```bash
 curl "http://localhost:8082/ratings/users/user-1"
 ```
+
+Ao testar pelo Gateway, envie o token JWT no header `Authorization` e nao envie `userId` no body.
 
 Acesse o RabbitMQ Management:
 
