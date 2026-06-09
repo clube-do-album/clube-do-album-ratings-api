@@ -28,6 +28,9 @@ public class Rating {
   @Column(name = "rating_value", nullable = false)
   private Double ratingValue;
 
+  @Column(name = "review", length = 1000)
+  private String review;
+
   @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;
 
@@ -36,11 +39,12 @@ public class Rating {
 
   protected Rating() {}
 
-  public Rating(String albumId, String userId, Double ratingValue) {
+  public Rating(String albumId, String userId, Double ratingValue, String review) {
     this.id = UUID.randomUUID();
     this.albumId = albumId;
     this.userId = userId;
     this.ratingValue = ratingValue;
+    this.review = review;
   }
 
   @PrePersist
@@ -71,6 +75,10 @@ public class Rating {
     return ratingValue;
   }
 
+  public String getReview() {
+    return review;
+  }
+
   public LocalDateTime getCreatedAt() {
     return createdAt;
   }
@@ -79,7 +87,8 @@ public class Rating {
     return updatedAt;
   }
 
-  public void updateRating(Double ratingValue) {
+  public void updateRating(Double ratingValue, String review) {
     this.ratingValue = ratingValue;
+    this.review = review;
   }
 }

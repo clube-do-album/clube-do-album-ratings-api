@@ -9,6 +9,7 @@ public record RatingResponse(
     String albumId,
     String userId,
     Double rating,
+    String review,
     LocalDateTime createdAt,
     LocalDateTime updatedAt) {
 
@@ -18,6 +19,7 @@ public record RatingResponse(
         rating.getAlbumId(),
         rating.getUserId(),
         rating.getRatingValue(),
+        rating.getReview(),
         rating.getCreatedAt(),
         rating.getUpdatedAt());
   }

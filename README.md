@@ -5,12 +5,14 @@ API responsavel pelas avaliacoes de albuns na plataforma Clube do Album.
 ## Responsabilidade
 
 - Criar avaliacoes de albuns.
+- Salvar review textual opcional junto da avaliacao.
 - Atualizar a avaliacao de um usuario para um album.
 - Listar avaliacoes por album.
 - Listar avaliacoes por usuario.
+- Listar avaliacoes publicas de outro usuario para perfil publico.
 - Publicar o evento `ALBUM_RATED` no RabbitMQ.
 
-Ainda nao implementa reviews completas, autenticacao real ou calculo de ranking.
+Ainda nao implementa autenticacao real interna ou calculo de ranking.
 
 ## Tecnologias usadas
 
@@ -92,7 +94,8 @@ Body:
 ```json
 {
   "albumId": "uuid-do-album",
-  "rating": 4.5
+  "rating": 4.5,
+  "review": "Texto opcional da review, com ate 1000 caracteres."
 }
 ```
 
@@ -111,6 +114,12 @@ GET /ratings/users/{userId}
 ```
 
 Essa rota tambem exige `X-User-Id` e so permite consultar o proprio usuario autenticado.
+
+```http
+GET /ratings/users/{userId}/public
+```
+
+Essa rota retorna as avaliacoes publicas de um usuario para exibicao no perfil publico.
 
 ## Mensageria
 
@@ -135,6 +144,8 @@ Payload:
 }
 ```
 
+A review fica armazenada na Ratings API e aparece nas rotas de consulta, mas nao e enviada no evento `ALBUM_RATED` nesta etapa.
+
 ## Como testar manualmente
 
 Suba a infraestrutura:
@@ -157,7 +168,7 @@ Crie ou atualize uma avaliacao:
 curl -X POST "http://localhost:8082/ratings" \
   -H "Content-Type: application/json" \
   -H "X-User-Id: user-1" \
-  -d '{"albumId":"album-1","rating":4.5}'
+  -d '{"albumId":"album-1","rating":4.5,"review":"Uma review curta sobre o album."}'
 ```
 
 Liste por album:

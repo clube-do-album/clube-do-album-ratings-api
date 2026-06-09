@@ -53,6 +53,11 @@ public class RatingController {
     return ratingService.listByUser(userId);
   }
 
+  @GetMapping("/users/{userId}/public")
+  public List<RatingResponse> listPublicByUser(@PathVariable String userId) {
+    return ratingService.listByUser(userId);
+  }
+
   private String requireAuthenticatedUser(String authenticatedUserId) {
     if (authenticatedUserId == null || authenticatedUserId.isBlank()) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "authentication required.");

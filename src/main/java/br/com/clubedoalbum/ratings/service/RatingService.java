@@ -22,15 +22,16 @@ public class RatingService {
 
   @Transactional
   public RatingResponse createOrUpdate(CreateOrUpdateRatingRequest request, String userId) {
+    var review = normalizeReview(request.review());
     var rating =
         ratingRepository
             .findByAlbumIdAndUserId(request.albumId(), userId)
             .map(
                 existingRating -> {
-                  existingRating.updateRating(request.rating());
+                  existingRating.updateRating(request.rating(), review);
                   return existingRating;
                 })
-            .orElseGet(() -> new Rating(request.albumId(), userId, request.rating()));
+            .orElseGet(() -> new Rating(request.albumId(), userId, request.rating(), review));
 
     var savedRating = ratingRepository.save(rating);
     albumRatedPublisher.publish(savedRating);
@@ -48,5 +49,13 @@ public class RatingService {
     return ratingRepository.findByUserIdOrderByUpdatedAtDesc(userId).stream()
         .map(RatingResponse::from)
         .toList();
+  }
+
+  private String normalizeReview(String review) {
+    if (review == null || review.isBlank()) {
+      return null;
+    }
+
+    return review.trim();
   }
 }
