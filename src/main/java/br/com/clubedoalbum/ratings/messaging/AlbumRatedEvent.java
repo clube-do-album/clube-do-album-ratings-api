@@ -5,4 +5,5 @@ public record AlbumRatedEvent(
     String albumId,
     String userId,
     Double rating,
+    String review,
     String occurredAt) {}

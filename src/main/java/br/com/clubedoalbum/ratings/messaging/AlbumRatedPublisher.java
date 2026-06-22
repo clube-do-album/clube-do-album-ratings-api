@@ -30,6 +30,7 @@ public class AlbumRatedPublisher {
             rating.getAlbumId(),
             rating.getUserId(),
             rating.getRatingValue(),
+            rating.getReview(),
             Instant.now().toString());
 
     rabbitTemplate.convertAndSend(exchange.getName(), routingKey, event);
