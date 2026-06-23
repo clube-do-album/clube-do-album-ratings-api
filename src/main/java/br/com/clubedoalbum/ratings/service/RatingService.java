@@ -2,11 +2,13 @@ package br.com.clubedoalbum.ratings.service;
 
 import br.com.clubedoalbum.ratings.domain.Rating;
 import br.com.clubedoalbum.ratings.dto.CreateOrUpdateRatingRequest;
+import br.com.clubedoalbum.ratings.dto.PaginatedResponse;
 import br.com.clubedoalbum.ratings.dto.RatingResponse;
+import br.com.clubedoalbum.ratings.dto.UserRatingSummaryResponse;
 import br.com.clubedoalbum.ratings.messaging.AlbumRatedPublisher;
 import br.com.clubedoalbum.ratings.repository.RatingRepository;
 import jakarta.transaction.Transactional;
-import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -39,16 +41,24 @@ public class RatingService {
     return RatingResponse.from(savedRating);
   }
 
-  public List<RatingResponse> listByAlbum(String albumId) {
-    return ratingRepository.findByAlbumIdOrderByUpdatedAtDesc(albumId).stream()
-        .map(RatingResponse::from)
-        .toList();
+  public PaginatedResponse<RatingResponse> listByAlbum(String albumId, Pageable pageable) {
+    return PaginatedResponse.from(
+        ratingRepository.findByAlbumIdOrderByUpdatedAtDesc(albumId, pageable)
+            .map(RatingResponse::from));
   }
 
-  public List<RatingResponse> listByUser(String userId) {
-    return ratingRepository.findByUserIdOrderByUpdatedAtDesc(userId).stream()
-        .map(RatingResponse::from)
-        .toList();
+  public PaginatedResponse<RatingResponse> listByUser(String userId, Pageable pageable) {
+    return PaginatedResponse.from(
+        ratingRepository.findByUserIdOrderByRatingValueDescUpdatedAtDesc(userId, pageable)
+            .map(RatingResponse::from));
+  }
+
+  public UserRatingSummaryResponse summarizeByUser(String userId) {
+    long totalRatings = ratingRepository.countByUserId(userId);
+    long reviewCount = ratingRepository.countByUserIdAndReviewIsNotNull(userId);
+    double averageRating = ratingRepository.averageRatingByUserId(userId);
+
+    return new UserRatingSummaryResponse(totalRatings, reviewCount, averageRating);
   }
 
   private String normalizeReview(String review) {
